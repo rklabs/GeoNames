@@ -21,7 +21,7 @@ class GeoNames:
         self.city_info = []
         self.kdtree = None
         self.kdtree_per_country = {}
-        self.geoname_lat_lng_mapping = {}
+        self.lat_lng_mapping = {}
 
         # Setup intial mapping and location dicts
         self.initial_setup()
@@ -48,7 +48,7 @@ class GeoNames:
                                                items[7], items[8], 'None'))
 
                 latitude, longitude = float(items[4]), float(items[5])
-                self.geoname_lat_lng_mapping[(latitude, longitude)] = items
+                self.lat_lng_mapping[(latitude, longitude)] = items
                 self.locations.append([latitude, longitude])
 
         # Insert all locations into KDTree
@@ -80,7 +80,7 @@ class GeoNames:
 
             return self.kdtree_per_country[country].query(location, k=k)
 
-# Global object reference
+# Global GenoNames object reference
 geoname = None
 
 
@@ -97,9 +97,9 @@ def geonames():
 def is_valid_city(keyword, cityinfo):
     """Returns True is city name is valid and found in either
     name, asciiname or altnames"""
-    return keyword.lower() in cityinfo.name.lower() or \
-        keyword.lower() in cityinfo.asciiname.lower() or \
-        keyword.lower() in cityinfo.altnames.lower()
+    for name in [cityinfo.name, cityinfo.asciiname, cityinfo.altnames]:
+        if keyword.lower() in name.lower():
+            return True
 
 
 def is_city(cityinfo):
@@ -158,9 +158,9 @@ def find_k_nearest_cities(city, k, country=None):
             latitude, longitude = \
                 geonames().kdtree_per_country[country].data[index]
 
-        city = geonames().geoname_lat_lng_mapping[(latitude, longitude)]
+        city = geonames().lat_lng_mapping[(latitude, longitude)]
 
         result.append(dict(city=city[1], country_code=city[8]))
-        print(geonames().geoname_lat_lng_mapping[(latitude, longitude)])
+        print(geonames().lat_lng_mapping[(latitude, longitude)])
 
     return result
