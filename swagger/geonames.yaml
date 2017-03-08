@@ -1,0 +1,61 @@
+swagger: "2.0"
+
+info:
+  title: "Geonames API"
+  version: "1.0"
+  description: "API's for working with genonames database" 
+
+basePath: /v1.0
+
+paths:
+  /cities/{keyword}:
+    get:
+      summary: Returns list of cities matching keyword
+      operationId: api.geonames.find_cities
+      parameters:
+      - name: keyword
+        in: path
+        type: string
+        description: keyword to be matched
+      responses:
+        200:
+          description: Fetch list of cities
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Item'
+
+  /nearest_cities:
+    get:
+      summary: Returns k nearest cities
+      operationId: api.geonames.find_k_nearest_cities
+      parameters:
+      - name: city
+        in: query
+        type: string
+        required: true
+      - name: k
+        in: query
+        type: integer
+        required: true
+      - name: country
+        in: query
+        type: string
+        required: false
+      responses:
+        200:
+          description: 'Fetch k nearest cities'
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Item'
+
+definitions:
+  Item:
+    type: object
+    properties:
+      id: 
+        type: integer
+        format: int64
+      name:
+        type: string
